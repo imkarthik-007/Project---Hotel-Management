@@ -1,0 +1,173 @@
+import mysql.connector
+
+
+class HotelManagement:
+
+    def __init__(self):
+        try:
+            self.conn = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="root123",   
+                database="hotel"
+            )
+            self.cursor = self.conn.cursor()
+
+            # Create table if not exists
+            self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS hotel (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100),
+                address VARCHAR(200),
+                checkin VARCHAR(50),
+                room_rent INT DEFAULT 0,
+                food_bill INT DEFAULT 0,
+                laundry_bill INT DEFAULT 0,
+                game_bill INT DEFAULT 0,
+                total INT DEFAULT 0
+            )
+            """)
+
+            self.conn.commit()
+
+        except mysql.connector.Error as err:
+            print("Database Connection Error:", err)
+            exit()
+
+        # Bill variables
+        self.room_rent = 0
+        self.food_bill = 0
+        self.laundry_bill = 0
+        self.game_bill = 0
+
+        print("\n***** WELCOME TO PARADISE HOTEL (MYSQL VERSION) *****\n")
+
+    # ---------------- CUSTOMER ----------------
+    def input_data(self):
+        self.name = input("Enter name: ")
+        self.address = input("Enter address: ")
+        self.checkin = input("Enter check-in date: ")
+
+    # ---------------- ROOM ----------------
+    def room(self):
+        print("\nRoom Types:")
+        print("1. Type A - 6000/day")
+        print("2. Type B - 5000/day")
+        print("3. Type C - 4000/day")
+
+        choice = input("Select room type: ")
+        days = int(input("No of days: "))
+
+        if choice == "1":
+            self.room_rent = 6000 * days
+        elif choice == "2":
+            self.room_rent = 5000 * days
+        else:
+            self.room_rent = 4000 * days
+
+        print("Room Rent:", self.room_rent)
+
+    # ---------------- FOOD ----------------
+    def food(self):
+        print("\nFood Menu:")
+        print("1. Tea - 10")
+        print("2. Meal - 100")
+
+        choice = input("Choice: ")
+        qty = int(input("Quantity: "))
+
+        if choice == "1":
+            self.food_bill += 10 * qty
+        else:
+            self.food_bill += 100 * qty
+
+        print("Food Bill:", self.food_bill)
+
+    # ---------------- LAUNDRY ----------------
+    def laundry(self):
+        qty = int(input("No of clothes: "))
+        self.laundry_bill = qty * 5
+        print("Laundry Bill:", self.laundry_bill)
+
+    # ---------------- GAMES ----------------
+    def games(self):
+        hrs = int(input("Hours played: "))
+        self.game_bill = hrs * 50
+        print("Game Bill:", self.game_bill)
+
+    # ---------------- SAVE TO DATABASE ----------------
+    def save(self):
+        total = self.room_rent + self.food_bill + self.laundry_bill + self.game_bill
+
+        sql = """
+        INSERT INTO hotel
+        (name, address, checkin, room_rent, food_bill, laundry_bill, game_bill, total)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        values = (
+            self.name,
+            self.address,
+            self.checkin,
+            self.room_rent,
+            self.food_bill,
+            self.laundry_bill,
+            self.game_bill,
+            total
+        )
+
+        self.cursor.execute(sql, values)
+        self.conn.commit()
+
+        print("\nBILL SAVED SUCCESSFULLY TO DATABASE")
+        print("TOTAL BILL =", total)
+
+    # ---------------- SHOW DATABASE ----------------
+    def show(self):
+        self.cursor.execute("SELECT * FROM hotel")
+        records = self.cursor.fetchall()
+
+        print("\n----- HOTEL DATABASE RECORDS -----")
+        for row in records:
+            print(row)
+
+    # ---------------- CLOSE CONNECTION ----------------
+    def close(self):
+        self.cursor.close()
+        self.conn.close()
+
+
+# ---------------- MAIN PROGRAM ----------------
+h = HotelManagement()
+h.input_data()
+
+while True:
+    print("\n----- MENU -----")
+    print("1. Room Booking")
+    print("2. Food Order")
+    print("3. Laundry")
+    print("4. Games")
+    print("5. Save Bill (DBMS)")
+    print("6. View Records")
+    print("7. Exit")
+
+    choice = input("Enter choice: ")
+
+    if choice == "1":
+        h.room()
+    elif choice == "2":
+        h.food()
+    elif choice == "3":
+        h.laundry()
+    elif choice == "4":
+        h.games()
+    elif choice == "5":
+        h.save()
+    elif choice == "6":
+        h.show()
+    elif choice == "7":
+        h.close()
+        print("Thank you for using Hotel Management System!")
+        break
+    else:
+        print("Invalid choice!")
