@@ -1,4 +1,9 @@
-# This project creates an interface of Hotel Management using Python Constructors and user-defined functions. 
-# It allows the user to give their information and provides various services of hotel for customers. 
-# Each service is monitored by each user-defined function. 
-# It also provides the Grandtotal Bill of the customers to them.
+# This project is a Hotel Management System developed using Python, Object-Oriented Programming (OOP), and MySQL Database Management System (DBMS).
+
+# It provides a console-based interface for managing hotel operations such as room booking, food ordering, laundry services, gaming services, and customer billing.
+
+# The project uses classes, constructors, and user-defined functions to handle different hotel services efficiently.
+
+# Customer details and billing information are permanently stored in a MySQL database using SQL queries.
+
+# The system automatically calculates the total bill and allows viewing stored customer records from the database.
